@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:resou="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context="com.example.administrator.myresouview.MainActivity">
+    <EditText
+    android:layout_width="match_parent"
+    android:id="@+id/myedit"
+    android:layout_height="wrap_content"/>
+    <com.example.resouview.MyResouView
+        android:id="@+id/myview"
+        android:layout_width="match_parent"
+        resou:stringarr="@array/resou"
+        android:layout_height="wrap_content">
+
+    </com.example.resouview.MyResouView>
+
+</LinearLayout>

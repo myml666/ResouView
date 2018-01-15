@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ReSouView</string>
+    <string-array name="resou">
+        <item>我爱你</item>
+        <item>北京</item>
+        <item>拉萨</item>
+        <item>77777</item>
+    </string-array>
+</resources>
