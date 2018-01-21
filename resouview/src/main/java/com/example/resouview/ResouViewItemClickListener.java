@@ -8,5 +8,10 @@ import android.widget.TextView;
  */
 
 public interface ResouViewItemClickListener {
-    void onItemClick(TextView view);
+    /**
+     *
+     * @param view 返回点击的TextView
+     * @param index 返回点击item的索引默认从0开始
+     */
+    void onItemClick(TextView view,int index);
 }

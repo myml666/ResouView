@@ -14,9 +14,6 @@
     <com.example.resouview.MyResouView
         android:id="@+id/myview"
         android:layout_width="match_parent"
-        resou:stringarr="@array/resou"
-        android:layout_height="wrap_content">
-
-    </com.example.resouview.MyResouView>
+        android:layout_height="match_parent"></com.example.resouview.MyResouView>
 
 </LinearLayout>

@@ -1,10 +1,13 @@
 package com.example.resouview;
 
 import android.content.Context;
-import android.content.res.TypedArray;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -16,38 +19,113 @@ import android.widget.TextView;
  */
 
 public class MyResouView extends LinearLayout {
-    private String resouwords[];
+    private static String mResouwords[]={};
     private ResouViewItemClickListener mResouViewItemClickListener;
-    private int loopFlag=0;
+    private int mMWidth;
+    private float lineWidth=0;
+    private int mStrokeWidth=2,mTextSize=12;
+    private boolean setBackgroundFlag=false;
+    private int normalBackgroundColor=Color.WHITE,pressBackgroundColor=Color.GRAY,normalStrokeColor=Color.GRAY,pressStrokeColor=Color.WHITE,normalTextColor=Color.BLACK,pressTextColor=Color.WHITE;
+    private StateListDrawable mBackgrounddrawable;
+    private StateListDrawable mTextDrawable;
+
     public ResouViewItemClickListener getResouViewItemClickListener() {
         return mResouViewItemClickListener;
     }
 
+    public int getNormalBackgroundColor() {
+        return normalBackgroundColor;
+    }
+
+    public int getTextSize() {
+        return mTextSize;
+    }
+
+    public void setTextSize(int textSize) {
+        mTextSize = textSize;
+    }
+
+    public void setNormalBackgroundColor(int normalBackgroundColor) {
+        this.normalBackgroundColor = normalBackgroundColor;
+    }
+
+    public int getPressBackgroundColor() {
+        return pressBackgroundColor;
+    }
+
+    public void setPressBackgroundColor(int pressBackgroundColor) {
+        this.pressBackgroundColor = pressBackgroundColor;
+    }
+
+    public int getNormalStrokeColor() {
+        return normalStrokeColor;
+    }
+
+    public void setNormalStrokeColor(int normalStrokeColor) {
+        this.normalStrokeColor = normalStrokeColor;
+    }
+
+    public int getPressStrokeColor() {
+        return pressStrokeColor;
+    }
+
+    public void setPressStrokeColor(int pressStrokeColor) {
+        this.pressStrokeColor = pressStrokeColor;
+    }
+
+    /**
+     *
+     * @param resouViewItemClickListener item点击事件
+     */
     public void setResouViewItemClickListener(ResouViewItemClickListener resouViewItemClickListener) {
         mResouViewItemClickListener = resouViewItemClickListener;
     }
 
     public String[] getResouwords() {
-        return resouwords;
+        return mResouwords;
     }
 
+    /**
+     *
+     * @param resouwords 需要传入的热搜词数组
+     */
     public void setResouwords(String[] resouwords) {
-        loopFlag=0;
-        this.resouwords = resouwords;
-        initloopFlag();
-        this.removeAllViews();
-        initView();
+        mResouwords = resouwords;
+        new Handler().postDelayed(new Runnable(){
+            public void run() {
+                mMWidth = getWidth();
+                removeAllViews();
+                lineWidth=0;
+                initView();
+            }
+        }, 100);
     }
-
-    private void initloopFlag() {
-        if(resouwords.length%4>0){
-            loopFlag+=1;
-        }
-        loopFlag=loopFlag+(resouwords.length/4);
-    }
-
     public MyResouView(Context context) {
         this(context,null);
+    }
+
+    public int getNormalTextColor() {
+        return normalTextColor;
+    }
+
+    public void setNormalTextColor(int normalTextColor) {
+        this.normalTextColor = normalTextColor;
+    }
+
+    public int getPressTextColor() {
+        return pressTextColor;
+    }
+
+    public int getStrokeWidth() {
+        return mStrokeWidth;
+    }
+
+    public void setStrokeWidth(int strokeWidth) {
+        mStrokeWidth = strokeWidth;
+    }
+
+    public void setPressTextColor(int pressTextColor) {
+        this.pressTextColor = pressTextColor;
     }
 
     public MyResouView(Context context, @Nullable AttributeSet attrs) {
@@ -57,19 +135,22 @@ public class MyResouView extends LinearLayout {
     public MyResouView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.setOrientation(VERTICAL);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.resou);
-        if(typedArray!=null){
-            CharSequence[] textArray = typedArray.getTextArray(R.styleable.resou_stringarr);
-            Log.e("sadsad",textArray[0]+"");
-            if(textArray.length>0){
-                resouwords=new String[textArray.length];
-                for(int x=0;x<textArray.length;x++){
-                    resouwords[x]=textArray[x]+"";
-                }
-                initloopFlag();
-                initView();
-            }
-        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        mMWidth = getWidth();
+        removeAllViews();
+        initView();
+    }
+    private ColorStateList createColorStateList(int normal, int pressed) {
+        int[] colors = new int[] { pressed, normal };
+        int[][] states = new int[2][];
+        states[0] = new int[] { android.R.attr.state_pressed};
+        states[1] = new int[] { -android.R.attr.state_pressed};
+        ColorStateList colorList = new ColorStateList(states, colors);
+        return colorList;
     }
     private void initView() {
         LinearLayout linearlayout;
@@ -79,51 +160,65 @@ public class MyResouView extends LinearLayout {
         paramsTextView.setMargins(10,0,0,0);
         params.topMargin=2;
         params.bottomMargin=2;
-        for(int x=0;x<loopFlag;x++){
-            linearlayout=new LinearLayout(getContext());
-            linearlayout.setOrientation(HORIZONTAL);
-            linearlayout.setLayoutParams(params);
-            if(x==loopFlag-1&&resouwords.length%4!=0){
-                for (int y = 0; y < resouwords.length%4; y++) {
-                    textView = new TextView(getContext());
-                    textView.setLayoutParams(paramsTextView);
-                    textView.setText(resouwords[x*4+y]);
-                    textView.setPadding(10, 6, 10, 6);
-                    textView.setBackground(getResources().getDrawable(R.drawable.resou_selector));
-                    textView.setTextColor(getResources().getColorStateList(R.color.tvcolor_selector));
-                    textView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (mResouViewItemClickListener != null) {
-                                mResouViewItemClickListener.onItemClick((TextView) v);
-                            }
+        linearlayout=new LinearLayout(getContext());
+        linearlayout.setLayoutParams(params);
+        linearlayout.setOrientation(HORIZONTAL);
+        if(mResouwords.length>0){
+            for(int x=0;x<mResouwords.length;x++){
+                textView = new TextView(getContext());
+                textView.setLayoutParams(paramsTextView);
+                textView.setText(mResouwords[x]);
+                textView.setPadding(12, 6, 12, 6);
+                textView.setTextSize(mTextSize);
+                mBackgrounddrawable = new StateListDrawable();
+                GradientDrawable myGrad_unpress = (GradientDrawable) getResources().getDrawable(R.drawable.resouback_unpress);
+                GradientDrawable myGrad_press = (GradientDrawable) getResources().getDrawable(R.drawable.resouback_pressed);
+                myGrad_unpress.setColor(normalBackgroundColor);
+                myGrad_press.setColor(pressBackgroundColor);
+                myGrad_press.setStroke(mStrokeWidth,pressStrokeColor);
+                myGrad_unpress.setStroke(mStrokeWidth,normalStrokeColor);
+                myGrad_press.setDither(true);
+                myGrad_unpress.setDither(true);
+                myGrad_press.setUseLevel(true);
+                myGrad_unpress.setUseLevel(true);
+                mBackgrounddrawable.addState(new int[]{-android.R.attr.state_pressed},myGrad_unpress);
+                mBackgrounddrawable.addState(new int[]{android.R.attr.state_pressed},myGrad_press);
+                mTextDrawable = new StateListDrawable();
+                GradientDrawable myGrad_textunpress = (GradientDrawable) getResources().getDrawable(R.drawable.resouback_unpress);
+                GradientDrawable myGrad_textpress = (GradientDrawable) getResources().getDrawable(R.drawable.resouback_pressed);
+                myGrad_textunpress.setColor(normalBackgroundColor);
+                myGrad_textpress.setColor(pressBackgroundColor);
+                myGrad_textpress.setDither(true);
+                myGrad_textunpress.setDither(true);
+                myGrad_textpress.setUseLevel(true);
+                myGrad_textunpress.setUseLevel(true);
+                mTextDrawable.addState(new int[]{-android.R.attr.state_pressed},myGrad_textunpress);
+                mTextDrawable.addState(new int[]{android.R.attr.state_pressed},myGrad_textpress);
+                textView.setBackground(mBackgrounddrawable);
+                textView.setTextColor(createColorStateList(normalTextColor,pressTextColor));
+                final int finalX = x;
+                textView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mResouViewItemClickListener != null) {
+                            mResouViewItemClickListener.onItemClick((TextView) v, finalX);
                         }
-                    });
-                    linearlayout.addView(textView);
+                    }
+                });
+                textView.measure(0,0);
+                lineWidth+=textView.getMeasuredWidth()+10;
+                if(lineWidth>mMWidth){
+                    if(linearlayout!=null){
+                        this.addView(linearlayout);
+                    }
+                    linearlayout=new LinearLayout(getContext());
+                    linearlayout.setLayoutParams(params);
+                    lineWidth=0;
                 }
-            }else {
-                for (int y = 0; y < 4; y++) {
-                    textView = new TextView(getContext());
-                    textView.setLayoutParams(paramsTextView);
-                    textView.setText(resouwords[x*4+y]);
-                    textView.setPadding(10, 6, 10, 6);
-                    textView.setTextColor(getResources().getColorStateList(R.color.tvcolor_selector));
-                    textView.setBackground(getResources().getDrawable(R.drawable.resou_selector));
-                    textView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (mResouViewItemClickListener != null) {
-                                mResouViewItemClickListener.onItemClick((TextView) v);
-                            }
-                        }
-                    });
-                    linearlayout.addView(textView);
-                }
+                linearlayout.addView(textView);
             }
             this.addView(linearlayout);
         }
-
-
     }
 
 }
